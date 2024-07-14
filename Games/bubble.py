@@ -1,3 +1,4 @@
+#on python 3.9.13 is worked!
 import cv2
 import mediapipe as mp
 import pygame
