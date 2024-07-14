@@ -97,28 +97,28 @@ class MainWinBubble(pygame.sprite.Sprite):
                 self.speed = 0
 
 def get_frame(cap):
-    ret, frame = cap.read()
-    frame = cv2.resize(frame, (width, height))
-    if not ret:
+    ret, frame = cap.read() #讀取鏡頭畫面
+    frame = cv2.resize(frame, (width, height)) #調整畫面大小降低延遲
+    if not ret: #如果沒有讀取到畫面
         return None, (0, 0)
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    results = hands.process(frame)
-    x1, y1 = 0, 0
-    if results.multi_hand_landmarks:
-        hand_landmarks = results.multi_hand_landmarks[0].landmark
-        single_hand = hand_landmarks[8]
-        x1, y1 = width - int(single_hand.x * width), int(single_hand.y * height)
-        for hand_landmarks in results.multi_hand_landmarks:
-            mp_drawing.draw_landmarks(
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) #轉換畫面顏色
+    results = hands.process(frame) #處理手部定位點
+    x1, y1 = 0, 0 #初始化手部座標
+    if results.multi_hand_landmarks: #如果偵測到手部
+        hand_landmarks = results.multi_hand_landmarks[0].landmark #取得手部定位點
+        single_hand = hand_landmarks[8] #取得食指指尖定位點
+        x1, y1 = width - int(single_hand.x * width), int(single_hand.y * height) #取得食指指尖座標
+        for hand_landmarks in results.multi_hand_landmarks: #遍歷每一隻手
+            mp_drawing.draw_landmarks( #繪製手部定位點
                 frame,
                 hand_landmarks,
                 mp_hands.HAND_CONNECTIONS,
                 mp_drawing_styles.get_default_hand_landmarks_style(),
                 mp_drawing_styles.get_default_hand_connections_style()
             )
-    frame = np.rot90(frame)
-    frame = pygame.surfarray.make_surface(frame)
-    return frame, (x1, y1)
+    frame = np.rot90(frame) #旋轉畫面
+    frame = pygame.surfarray.make_surface(frame) #轉換畫面格式
+    return frame, (x1, y1) #返回畫面和手部座標
 
 def end_screen(total_time):
     font = pygame.font.Font(None, 48)
